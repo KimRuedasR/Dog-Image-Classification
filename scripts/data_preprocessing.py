@@ -22,7 +22,7 @@ def remove_invalid_images(data_directory, valid_extensions):
                     img = cv2.imread(image_path)
                     img_type = imghdr.what(image_path)
                     if img_type not in valid_extensions:
-                        print(f'Imagen no en la lista de extensiones {image_path}')
+                        print(f'Imagen con extensión no valida: {image_path}')
                         os.remove(image_path)
                 except Exception as e:
                     print(f'Problema con la imagen {image_path}')
@@ -37,12 +37,24 @@ remove_invalid_images(data_dir, image_exts)
 data = load_data(data_dir)
 
 # Visualización de los datos
-def display_batch(batch):
-    fig, ax = plt.subplots(ncols=4, figsize=(20, 20))
-    for idx, img in enumerate(batch[0][:4]):
+# Guardar los plots en una carpeta
+def display_batch(batch, save_dir='plots', num_examples=4):
+    fig, ax = plt.subplots(ncols=num_examples, figsize=(20, 20))
+    for idx, img in enumerate(batch[0][:num_examples]):
         ax[idx].imshow(img.astype(int))
         ax[idx].title.set_text(batch[1][idx])
-    plt.show()
+        # Guardarlos en archivos diferentes
+        fig.savefig(os.path.join(save_dir, f'ejemplo_{idx}.png'))
+    plt.close(fig)
+
+
+# Mostrar los plots en un ambiente interactivo
+# def display_batch(batch, save_path='plots', num_examples=4):
+#     fig, ax = plt.subplots(ncols=4, figsize=(20, 20))
+#     for idx, img in enumerate(batch[0][:4]):
+#         ax[idx].imshow(img.astype(int))
+#         ax[idx].title.set_text(batch[1][idx])
+#     plt.show()
 
 # Obtener un batch de datos
 data_iterator = data.as_numpy_iterator()
