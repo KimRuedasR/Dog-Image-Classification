@@ -1,3 +1,4 @@
+# 2. Data scaling
 import tensorflow as tf
 
 # Escalar los datos

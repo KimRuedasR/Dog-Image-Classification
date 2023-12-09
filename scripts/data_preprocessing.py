@@ -1,9 +1,15 @@
+# 1. Data preprocessing
 import os
 import cv2
 import imghdr
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
+# Configuración de variables de entorno para CUDA y XLA para asegurar el uso de aceleración por GPU
+os.environ['CUDA_HOME'] = '/opt/cuda'
+os.environ['LD_LIBRARY_PATH'] = '/opt/cuda/lib64:/opt/cuda/extras/CUPTI/lib64'
+os.environ['PATH'] = '/opt/cuda/bin:' + os.environ['PATH']
+os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/opt/cuda'
 
 # Directorio de datos y extensiones de imagen válidas
 data_dir = 'data'

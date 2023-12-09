@@ -1,3 +1,4 @@
+# 7. Model Training
 import tensorflow as tf
 from model_building import build_model
 import os
@@ -9,26 +10,30 @@ os.environ['PATH'] = '/opt/cuda/bin:' + os.environ['PATH']
 os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/opt/cuda'
 
 # Función para cargar los datos
-def load_data(data_dir, img_height=256, img_width=256, batch_size=32):
-    # Cargar el conjunto de datos de entrenamiento
-    train_ds = tf.keras.utils.image_dataset_from_directory(
-        data_dir,
-        validation_split=0.2,
-        subset="training",
-        seed=123,
-        image_size=(img_height, img_width),
-        batch_size=batch_size)
-
-    # Cargar el conjunto de datos de validación
-    val_ds = tf.keras.utils.image_dataset_from_directory(
-        data_dir,
-        validation_split=0.2,
-        subset="validation",
-        seed=123,
-        image_size=(img_height, img_width),
-        batch_size=batch_size)
-
-    return train_ds, val_ds
+def load_data(data_dir, img_height=256, img_width=256, batch_size=32, subset=None):
+    if subset == 'training':
+        return tf.keras.utils.image_dataset_from_directory(
+            data_dir,
+            validation_split=0.2,
+            subset="training",
+            seed=123,
+            image_size=(img_height, img_width),
+            batch_size=batch_size)
+    elif subset == 'validation':
+        return tf.keras.utils.image_dataset_from_directory(
+            data_dir,
+            validation_split=0.2,
+            subset="validation",
+            seed=123,
+            image_size=(img_height, img_width),
+            batch_size=batch_size)
+    elif subset == 'test':
+        return tf.keras.utils.image_dataset_from_directory(
+            data_dir,
+            image_size=(img_height, img_width),
+            batch_size=batch_size)
+    else:
+        raise ValueError("Set invalido, elegir: 'training', 'validation', o 'test'")
 
 # Función para entrenar el modelo
 def train_model(train_ds, val_ds, epochs=20):
@@ -38,9 +43,13 @@ def train_model(train_ds, val_ds, epochs=20):
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir='logs')
     # Entrenar el modelo
     history = model.fit(train_ds, epochs=epochs, validation_data=val_ds, callbacks=[tensorboard_callback])
+
+    model.save('models/imageclassifier.h5')
+
     return model, history
 
 # Cargar los datos de entrenamiento y entrenar el modelo
 if __name__ == "__main__":
-    train_data, val_data = load_data('data/dogs')
+    train_data = load_data('data/dogs', subset='training')
+    val_data = load_data('data/dogs', subset='validation')
     model, history = train_model(train_data, val_data)
